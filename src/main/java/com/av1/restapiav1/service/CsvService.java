@@ -119,7 +119,8 @@ public class CsvService {
 
     public void ExportaExcel(String path)
     {
-        try {
+        try
+        {
             ArrayList<String> listaArquivo = GetDocumento(path);
             ArrayList<String> datas = RecuperData(listaArquivo,0 ,10);
             ArrayList<Double> fechamento = ConvertStringToDouble(listaArquivo,35,42);
@@ -175,28 +176,28 @@ public class CsvService {
 
             for (int i = 0; i < datas.size(); i++) {
 
-                int linha =i+1;
+                int linha = i+1;
                 Label label = new Label(0, linha, datas.get(i),cellForm);
                 aba.addCell(label);
                 Number number = new Number(1, linha, fechamento.get(i),cellForm);
                 aba.addCell(number);
-                Number number1 = new Number(2, linha, mmc.size() > i? mmc.get(i) : 0,cellForm);
-                aba.addCell(number1);
-                Number number2 = new Number(3, linha, mmi.size() > i? mmi.get(i) : 0,cellForm);
-                aba.addCell(number2);
-                Number number3 = new Number(4, linha, mml.size() > i? mml.get(i) : 0,cellForm);
-                aba.addCell(number3);
-                Number number4 = new Number(5, linha,mmexp.size() > i? mmexp.get(i) : 0,cellForm);
-                aba.addCell(number4);
-                Number number5 = new Number(6, linha,volatilidade.size() > i?volatilidade.get(i) : 0,cellForm);
-                aba.addCell(number5);
-
+                Number number1 = new Number(2, linha+4, mmc.size() > i? mmc.get(i) : 0,cellForm);
+                if(number1.getValue() != 0) aba.addCell(number1);
+                Number number2 = new Number(3, linha+19, mmi.size() > i? mmi.get(i) : 0,cellForm);
+                if(number2.getValue() != 0) aba.addCell(number2);
+                Number number3 = new Number(4, linha+99, mml.size() > i? mml.get(i) : 0,cellForm);
+                if(number3.getValue() != 0) aba.addCell(number3);
+                Number number4 = new Number(5, linha+4,mmexp.size() > i? mmexp.get(i) : 0,cellForm);
+                if(number4.getValue() != 0) aba.addCell(number4);
+                Number number5 = new Number(6, linha+4,volatilidade.size() > i?volatilidade.get(i) : 0,cellForm);
+                if(number5.getValue() != 0) aba.addCell(number5);
             }
             planilha.write();
             System.out.println("Excel exportado!");
             planilha.close();
-
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             e.printStackTrace();
         }
     }
