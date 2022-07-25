@@ -201,11 +201,8 @@ public class CsvService {
             e.printStackTrace();
         }
     }
-    public void PrintRealTime(String path)
+    public void PrintRealTime(ArrayList<Double> path)
     {
         final DynamicDataDemo demo = new DynamicDataDemo(path);
-        demo.pack();
-        RefineryUtilities.centerFrameOnScreen(demo);
-        demo.setVisible(true);
     }
 }

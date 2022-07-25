@@ -1,112 +1,54 @@
 package com.av1.restapiav1.utils;
 
 import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartFrame;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.ValueAxis;
+import org.jfree.chart.block.BlockBorder;
+import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.time.Millisecond;
 import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
 import org.jfree.data.xy.XYDataset;
+import org.jfree.data.xy.XYSeries;
+import org.jfree.data.xy.XYSeriesCollection;
 import org.jfree.ui.ApplicationFrame;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
-/**
- * A demonstration application showing a time series chart where you can dynamically add
- * (random) data by clicking on a button.
- *
- */
-public class DynamicDataDemo extends ApplicationFrame implements ActionListener {
+public class DynamicDataDemo {
 
-    /**
-     * The time series data.
-     */
-    private TimeSeries series;
 
-    /**
-     * The most recent value added.
-     */
-    private double lastValue = 100.0;
+    public DynamicDataDemo(ArrayList<Double>valores) {
 
-    /**
-     * Constructs a new demonstration application.
-     *
-     * @param title the frame title.
-     */
-    public DynamicDataDemo(final String title) {
 
-        super(title);
-        this.series = new TimeSeries("Random Data", Millisecond.class);
-        final TimeSeriesCollection dataset = new TimeSeriesCollection(this.series);
-        final JFreeChart chart = createChart(dataset);
+        XYSeriesCollection dataset = new XYSeriesCollection();
+        XYSeries rec = new XYSeries("dados");
 
-        final ChartPanel chartPanel = new ChartPanel(chart);
-        final JButton button = new JButton("Add New Data Item");
-        button.setActionCommand("ADD_DATA");
-        button.addActionListener(this);
-
-        final JPanel content = new JPanel(new BorderLayout());
-        content.add(chartPanel);
-        content.add(button, BorderLayout.SOUTH);
-        chartPanel.setPreferredSize(new java.awt.Dimension(500, 270));
-        setContentPane(content);
-
-    }
-
-    /**
-     * Creates a sample chart.
-     *
-     * @param dataset the dataset.
-     * @return A sample chart.
-     */
-    private JFreeChart createChart(final XYDataset dataset) {
-        final JFreeChart result = ChartFactory.createTimeSeriesChart(
-                "Dynamic Data Demo",
-                "Time",
-                "Value",
-                dataset,
-                true,
-                true,
-                false
-        );
-        final XYPlot plot = result.getXYPlot();
-        ValueAxis axis = plot.getDomainAxis();
-        axis.setAutoRange(true);
-        axis.setFixedAutoRange(60000.0);  // 60 seconds
-        axis = plot.getRangeAxis();
-        axis.setRange(0.0, 200.0);
-        return result;
-    }
-
-    // ****************************************************************************
-    // * JFREECHART DEVELOPER GUIDE                                               *
-    // * The JFreeChart Developer Guide, written by David Gilbert, is available   *
-    // * to purchase from Object Refinery Limited:                                *
-    // *                                                                          *
-    // * http://www.object-refinery.com/jfreechart/guide.html                     *
-    // *                                                                          *
-    // * Sales are used to provide funding for the JFreeChart project - please    *
-    // * support us so that we can continue developing free software.             *
-    // ****************************************************************************
-
-    /**
-     * Handles a click on the button by adding new (random) data.
-     *
-     * @param e the action event.
-     */
-    public void actionPerformed(final ActionEvent e) {
-        if (e.getActionCommand().equals("ADD_DATA")) {
-            final double factor = 0.90 + 0.2 * Math.random();
-            this.lastValue = this.lastValue * factor;
-            final Millisecond now = new Millisecond();
-            System.out.println("Now = " + now.toString());
-            this.series.add(new Millisecond(), this.lastValue);
+        for(int i = 0; i <= valores.size() - 1; ++i) {
+            rec.add(i, valores.get(i));
         }
-    }
 
+        dataset.addSeries(rec);
+        JFreeChart chart = ChartFactory.createXYLineChart("grafico teste", "horas somadas", "valores fechamento", dataset, PlotOrientation.VERTICAL, true, true, false);
+        XYPlot plot = chart.getXYPlot();
+        XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer();
+        renderer.setSeriesPaint(0, Color.RED);
+        renderer.setSeriesStroke(0, new BasicStroke(1.0F));
+        plot.setRenderer(renderer);
+        plot.setBackgroundPaint(Color.white);
+        plot.setRangeGridlinesVisible(true);
+        plot.setDomainGridlinesVisible(true);
+        chart.getLegend().setFrame(BlockBorder.NONE);
+        ChartFrame frame1 = new ChartFrame("Gráfico de linhas", chart);
+        frame1.setVisible(true);
+        frame1.setSize(1300, 800);
+    }
 }

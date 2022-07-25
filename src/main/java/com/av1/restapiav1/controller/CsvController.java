@@ -66,6 +66,6 @@ public class CsvController {
     @GetMapping("/print/{path}")
     public void PrintRealTime(String path)
     {
-        service.PrintRealTime(path);
+        service.PrintRealTime(GetDocumentoFechamento("arquivo01"));
     }
 }
