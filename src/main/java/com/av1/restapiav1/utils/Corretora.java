@@ -12,10 +12,11 @@ import java.util.concurrent.Semaphore;
 
 public class Corretora extends Thread{
 
-    private Ativo ativoA, ativoB, ativoC, ativoD;
+    public Ativo ativoA, ativoB, ativoC, ativoD;
 
     private Semaphore caixa1, caixa2;
-    public boolean fim = true;
+    public static final int tamMml= 100; //média mais longa requer 100 valores
+    public static boolean fim = true;
 
     public Corretora(Ativo ativoA, Ativo ativoB, Ativo ativoC,Ativo ativoD)
     {
@@ -26,56 +27,19 @@ public class Corretora extends Thread{
     }
 
     @Override
-    public void run() {
-        ArrayList<Double> valoresA = GetDocumentoFechamento("arquivo01");
-        ArrayList<Double> valoresB = GetDocumentoFechamento("arquivo02");
-        ArrayList<Double> valoresC = GetDocumentoFechamento("arquivo03");
-        ArrayList<Double> valoresD = GetDocumentoFechamento("arquivo04");
-        //neccesário iniciar com valores para atender a todas as médias
-        //média mais longa requer 100 valores
-        for (int i = 0; i<100; i++)
-        {
-            ativoA.valores.add(valoresA.get(i));
-            ativoB.valores.add(valoresB.get(i));
-            ativoC.valores.add(valoresC.get(i));
-            ativoD.valores.add(valoresD.get(i));
-        }
-        try
-        {
-            //inicia todos clientes
-            //atualiza indicadores
-            //antes de finalizar, mostra o fechamento final
-            double a = 0, b = 0, c = 0, d = 0;
+    public synchronized void run() {
 
-            for (int i = 100; i < valoresA.size(); i++) {
-                a = valoresA.get(i);
-                b = valoresB.get(i);
-                c = valoresC.get(i);
-                d = valoresD.get(i);
+            AtualizaTodosAtivos atualizaTodosAtivos = new AtualizaTodosAtivos(ativoA, ativoB, ativoC, ativoD);
 
-                AtualizaAtivo(ativoA, a);
-                AtualizaAtivo(ativoB, b);
-                AtualizaAtivo(ativoC, c);
-                AtualizaAtivo(ativoD, d);
-                Thread.sleep(500);
-            }
+            Thread att = new Thread(atualizaTodosAtivos);
 
-            System.out.println("desligando");
-            this.fim = false;
-            this.interrupt();
-        }
-        catch (InterruptedException e)
-        {
-            throw new RuntimeException(e);
-        }
+            att.start();
+
+
+
+        //TODO: após atualizar todos, exibe o balaço final de cada cliente -> salvar pelo ID?
+        //TODO: medotodos de compra e venda -->ideia retorna boleano sinalizando compra/venda executada (SEMAFORO)
     }
-
-    private void AtualizaAtivo(Ativo ativo, double valor)
-    {
-        ativo.valores.add(valor);
-    }
-    //medotods de compra e venda -->ideia retorna boleano sinalizando compra/venda executada (CEMAFORO)
-
 
 
 

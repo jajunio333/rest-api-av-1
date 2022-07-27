@@ -34,13 +34,25 @@ public class TradeService {
 
     public void Iniciar () //método para gerenciar a simulação de trades
     {
-        Ativo ativo1 = new Ativo();
-        Ativo ativo2 = new Ativo();
-        Ativo ativo3 = new Ativo();
-        Ativo ativo4 = new Ativo();
+        Ativo ativo1 = new Ativo("ativoA");
+        Ativo ativo2 = new Ativo("ativoB");
+        Ativo ativo3 = new Ativo("ativoC");
+        Ativo ativo4 = new Ativo("ativoD");
+        Corretora corretora1 = new Corretora(ativo1, ativo2, ativo3, ativo4);
+        Cliente cliente = new Cliente(corretora1,1);
+        Cliente cliente2 = new Cliente(corretora1,2);
 
-        Cliente cliente = new Cliente(ativo1, ativo2, ativo3, ativo4);
-        cliente.run();
+        Thread corretora = new Thread(corretora1);
+        Thread t2 = new Thread(cliente);
+        Thread t3 = new Thread(cliente2);
+        Thread t4 = new Thread(cliente);
+        corretora.start();
+        t2.start();
+        t3.start();
+        //t4.start();
+        //TODO: iniciar corretora antes de cliente
+        //thread deve iniciar aqui
+
     }
 
 }
