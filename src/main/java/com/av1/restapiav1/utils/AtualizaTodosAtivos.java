@@ -17,6 +17,11 @@ public class AtualizaTodosAtivos extends Thread{
 
     public AtualizaTodosAtivos(Ativo ativoA, Ativo ativoB, Ativo ativoC,Ativo ativoD)
     {
+        this.ativoA = ativoA;
+        this.ativoB = ativoB;
+        this.ativoC = ativoC;
+        this.ativoD = ativoD;
+
         this.valoresA = GetDocumentoFechamento("arquivo01");
         this.valoresB = GetDocumentoFechamento("arquivo02");
         this.valoresC = GetDocumentoFechamento("arquivo03");

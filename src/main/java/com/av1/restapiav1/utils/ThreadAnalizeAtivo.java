@@ -31,7 +31,7 @@ public class ThreadAnalizeAtivo extends Thread{
             {
                 if (ativo.valores.size() > size)
                 {
-                    System.out.println("incrementou " + ativo.valores.size() +"id Cliente: " + idCiente + " ativo: " + ativo.getNome());
+                    System.out.println("incrementou " + ativo.valores.size() +" id Cliente: " + idCiente + " ativo: " + ativo.getNome());
                     size = ativo.valores.size();
                 }
                 else
