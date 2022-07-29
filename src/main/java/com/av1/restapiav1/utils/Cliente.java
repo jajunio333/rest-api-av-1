@@ -18,7 +18,7 @@ public class Cliente extends Thread{
         this.ativoD = corretora.ativoD;
         this.corretora = corretora;
         this.id = id;
-        this.saldo = 1000;
+        this.saldo = 100;
     }
 
     @Override

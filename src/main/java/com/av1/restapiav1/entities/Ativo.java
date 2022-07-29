@@ -10,10 +10,12 @@ import java.util.ArrayList;
 public class Ativo {
     public String nome;
     public ArrayList<Double> valores;
+    public ArrayList<String> dataTime;
 
     public Ativo(String nome)
     {
         this.nome = nome;
         this.valores = new ArrayList<>();
+        this.dataTime = new ArrayList<>();
     }
 }

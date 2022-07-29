@@ -17,6 +17,13 @@ public class Corretora extends Thread{
     private Semaphore caixa1, caixa2;
     public static final int tamMml= 100; //média mais longa requer 100 valores
     public static boolean fim = true;
+    private ArrayList<String> timeOperacoes;
+    private ArrayList<String> nomeAtivosOperacao;
+    private ArrayList<Long> idCliente;
+    private ArrayList<Double> qtdAtivo;
+    private ArrayList<Character> compraOuVenda; //c para compra e v para venda
+
+
 
     public Corretora(Ativo ativoA, Ativo ativoB, Ativo ativoC,Ativo ativoD)
     {
@@ -24,6 +31,15 @@ public class Corretora extends Thread{
         this.ativoB = ativoB;
         this.ativoC = ativoC;
         this.ativoD = ativoD;
+        this.timeOperacoes = new ArrayList<>();
+        this.nomeAtivosOperacao = new ArrayList<>();
+        this.idCliente = new ArrayList<>();
+        this.qtdAtivo = new ArrayList<>();
+        this.compraOuVenda = new ArrayList<>();
+
+        // inicializar os semáforos
+        caixa1 = new Semaphore(1);
+        caixa2 = new Semaphore(1);
     }
 
     @Override
@@ -35,87 +51,38 @@ public class Corretora extends Thread{
 
             att.start();
 
-
-
         //TODO: após atualizar todos, exibe o balaço final de cada cliente -> salvar pelo ID?
         //TODO: medotodos de compra e venda -->ideia retorna boleano sinalizando compra/venda executada (SEMAFORO)
     }
 
-
-
-
-
-
-
-
-
-    /*
-    private void compra(Ativo ativo){
-
+    public void Caixas (String nomeAtivo, long idCiente, int quantidade, char CV, int prioridade) throws InterruptedException {
         if(caixa1.tryAcquire()){
-            ativo.valor = getAtivo(ativo.nomeAtivo).valor[0];
-            ativo.comprado = true;
+            System.out.println("caixa 1");
+            atualizaCompras(nomeAtivo, idCiente, quantidade, CV);
             caixa1.release();
+
         }else{
             if(caixa2.tryAcquire()){
-                ativo.valor = getAtivo(ativo.nomeAtivo).valor[0];
-                ativo.comprado = true;
+                System.out.println("caixa 2");
+                atualizaCompras(nomeAtivo, idCiente, quantidade, CV);
                 caixa2.release();
             }
         }
 
     }
 
-    private void venda(Ativo ativo){
-
-        if(caixa1.tryAcquire()){
-            ativo.valor = getAtivo(ativo.nomeAtivo).valor[0];
-            ativo.comprado = false;
-            caixa1.release();
-        }else{
-            if(caixa2.tryAcquire()){
-                ativo.valor = getAtivo(ativo.nomeAtivo).valor[0];
-                ativo.comprado = false;
-                caixa2.release();
-            }
-        }
-
+    public void atualizaCompras(String nomeAtivo, long idCiente, int quantidade, char CV)
+    {
+        int passo = ativoA.dataTime.size()-1;
+        timeOperacoes.add(ativoA.dataTime.get(passo));
+        nomeAtivosOperacao.add(nomeAtivo);
+        this.idCliente.add(idCiente);
+        this.qtdAtivo.add(quantidade*ativoA.valores.get(passo));
+        this.compraOuVenda.add(CV);
     }
 
 
 
-    private Ativo getAtivo(String nome){
-        if(nome == ativoA.nomeAtivo)
-        {
-            return ativoA;
-        }
-        else
-        {
-            if(nome == ativoB.nomeAtivo)
-            {
-                return ativoB;
-            }
-            else
-            {
-                if(nome == ativoC.nomeAtivo)
-                {
-                    return ativoC;
-                }
-                else
-                {
-                    if(nome == ativoD.nomeAtivo)
-                    {
-                        return ativoD;
-                    }
-                    else
-                    {
-                        return null;
-                    }
-                }
-            }
-        }
-    }
-*/
 
     public ArrayList<String> GetDocumento(String file)
     {
@@ -150,14 +117,7 @@ public class Corretora extends Thread{
         }
         return valores;
     }
-    public ArrayList<String> RecuperData (ArrayList<String> arquivo, int inicio, int fim)
-    {
-        ArrayList<String> valores = new ArrayList<>();
-        for (String val : arquivo) {
-            valores.add(val.substring(inicio, fim));
-        }
-        return valores;
-    }
+
     public ArrayList<Double> MediaSimples(String path, int tamanhoMedia)
     {
 

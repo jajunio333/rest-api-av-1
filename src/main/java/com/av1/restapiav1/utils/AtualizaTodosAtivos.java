@@ -13,6 +13,7 @@ public class AtualizaTodosAtivos extends Thread{
 
     public Ativo ativoA, ativoB, ativoC, ativoD;
     private ArrayList<Double> valoresA, valoresB, valoresC, valoresD;
+    private ArrayList<String> dataA, dataB, dataC, dataD;
 
 
     public AtualizaTodosAtivos(Ativo ativoA, Ativo ativoB, Ativo ativoC,Ativo ativoD)
@@ -26,14 +27,24 @@ public class AtualizaTodosAtivos extends Thread{
         this.valoresB = GetDocumentoFechamento("arquivo02");
         this.valoresC = GetDocumentoFechamento("arquivo03");
         this.valoresD = GetDocumentoFechamento("arquivo04");
-        //neccesário iniciar com valores para atender a todas as médias.
 
+        this.dataA = RecuperData("arquivo01");
+        this.dataB = RecuperData("arquivo02");
+        this.dataC = RecuperData("arquivo03");
+        this.dataD = RecuperData("arquivo04");
+
+        //neccesário iniciar com valores para atender a todas as médias.
         for (int i = 0; i<Corretora.tamMml; i++)
         {
             ativoA.valores.add(valoresA.get(i));
             ativoB.valores.add(valoresB.get(i));
             ativoC.valores.add(valoresC.get(i));
             ativoD.valores.add(valoresD.get(i));
+
+            ativoA.dataTime.add(dataA.get(i));
+            ativoB.dataTime.add(dataB.get(i));
+            ativoC.dataTime.add(dataC.get(i));
+            ativoD.dataTime.add(dataD.get(i));
         }
 
     }
@@ -47,16 +58,18 @@ public class AtualizaTodosAtivos extends Thread{
         {
             while(valoresA.size() > ativoA.valores.size())
             {
-                AtualizaAtivo(ativoA, valoresA.get(i));
-                AtualizaAtivo(ativoB, valoresB.get(i));
-                AtualizaAtivo(ativoC, valoresC.get(i));
-                AtualizaAtivo(ativoD, valoresD.get(i));
+                AtualizaAtivo(ativoA, valoresA.get(i), dataA.get(i));
+                AtualizaAtivo(ativoB, valoresB.get(i), dataB.get(i));
+                AtualizaAtivo(ativoC, valoresC.get(i), dataC.get(i));
+                AtualizaAtivo(ativoD, valoresD.get(i), dataD.get(i));
                 i++;
 
                 Thread.sleep(1000);
             }
 
             System.out.println("desligando");
+            //TODO: calcular corretora
+            //TODO: fazer rd olhando saldo inicial, e saldo final
             Corretora.fim = false;
 
             Thread.interrupted();
@@ -66,9 +79,10 @@ public class AtualizaTodosAtivos extends Thread{
             throw new RuntimeException(e);
         }
     }
-    private void AtualizaAtivo(Ativo ativo, double valor)
+    private void AtualizaAtivo(Ativo ativo, double valor, String data)
     {
         ativo.valores.add(valor);
+        ativo.dataTime.add(data);
     }
 
     public static ArrayList<String> GetDocumento(String file)
@@ -108,6 +122,15 @@ public class AtualizaTodosAtivos extends Thread{
         ArrayList<String> aux = GetDocumento(file);
         ArrayList<Double> dados = ConvertStringToDouble(aux,35,42);
         return dados;
+    }
+    public ArrayList<String> RecuperData (String path)
+    {
+        ArrayList<String> aux = GetDocumento(path);
+        ArrayList<String> valores = new ArrayList<>();
+        for (String val : aux) {
+            valores.add(val.substring(0, 10));
+        }
+        return valores;
     }
 
 

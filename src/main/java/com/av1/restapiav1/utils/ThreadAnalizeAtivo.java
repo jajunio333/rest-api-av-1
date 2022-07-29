@@ -12,22 +12,19 @@ public class ThreadAnalizeAtivo extends Thread{
     private int size;
     private long idCiente;
     private double saldo;//TODO: SALDO - PRECISA FAZER CONTROLE DE ACESSO
-    private int valormin;
+    private boolean comprado;
 
     public ThreadAnalizeAtivo(Ativo ativo, Corretora corretora, int size, long idCiente, double saldo) {
         this.ativo = ativo;
         this.corretora = corretora;
         this.size = size;
         this.idCiente = idCiente;
-        this.saldo = saldo;
+        this.saldo = saldo; //VAI VIRAR FUNÇÃO
     }
 
     @Override
-    public void run()//TODO: verificar por alteração de size do ativo
+    public void run()
     {
-        //houve alteração no tamanho?
-        //sim -> atualiza as médias -> verifica os indicadores de compra e venda -> caso disparado realiza a compra/venda SE POSSÍVEL e com semaforo -> atualiza o valor de tamanho ->fim
-        //nao -> aguarda alteração
         int numNegociacao = 0;
 
         while (this.corretora.fim && numNegociacao < 1000)
@@ -36,8 +33,8 @@ public class ThreadAnalizeAtivo extends Thread{
             {
                 if (ativo.valores.size() > size)
                 {
-                   boolean comprado = VerificaCompra(ativo.valores);
-                   boolean vendido = VerificaVenda(ativo.valores);
+                   boolean comprar = VerificaCompra(ativo.valores);
+                   boolean vender = VerificaVenda(ativo.valores);
 
                     ArrayList<Double> volatilidade = Volatilidade(ativo.valores,8);
                     int prioridade = 5;
@@ -50,24 +47,27 @@ public class ThreadAnalizeAtivo extends Thread{
                    //gerenciar saldo
 
 
-                   if(comprado)
+                   if( comprar && !comprado)
                    {
-                       while (saldo>10)
+                       if (saldo>10)
                        {
-                           //corretora.comprar(ativo.nome, idCiente, 10, prioridade);
+                           corretora.Caixas (ativo.getNome(), idCiente, 10, 'c', prioridade);
                            System.out.println(" id Cliente: " + idCiente + " COMPROU 10 ativos: " + ativo.getNome()+" no preço de : "+ ativo.valores.get(ativo.valores.size()-1));
-
                        }
                        numNegociacao++;
+                       comprado= true;
+                       saldo = saldo - 10;
                    }
-                   if(vendido)
+                   if(vender)
                    {
-                       while (saldo<1000)
+                       if (saldo<1000)
                        {
-                           //corretora.comprar(ativo.nome, idCiente, 10, prioridade);
+                           corretora.Caixas (ativo.getNome(), idCiente, 10, 'c', prioridade);
                            System.out.println(" id Cliente: " + idCiente + " VENDEU 10 ativos: " + ativo.getNome()+" no preço de : "+ ativo.valores.get(ativo.valores.size()-1));
                        }
                        numNegociacao++;
+                       comprado= false;
+                       saldo = saldo + 10;
                    }
 
                     size = ativo.valores.size();
@@ -87,8 +87,9 @@ public class ThreadAnalizeAtivo extends Thread{
     public boolean VerificaCompra(ArrayList<Double> valores)
     {
         ArrayList<Double> media8 = MediaExp(valores,8);
-        if(valores.get(valores.size()-2) < media8.get(media8.size()-2) && valores.get(valores.size()-1) > media8.get(media8.size()-1))
-        {
+        ArrayList<Double> media20 = MediaExp(valores,20);
+        if(media8.get(media8.size()-2) < media20.get(media20.size()-2) && media8.get(media8.size()-1) > media20.get(media20.size()-1))
+        {//cruzamento sem confirmação, tendencia curta de alta
             return true;
         }
         return false;
@@ -96,8 +97,9 @@ public class ThreadAnalizeAtivo extends Thread{
     public boolean VerificaVenda(ArrayList<Double> valores)
     {
         ArrayList<Double> media8 = MediaExp(valores,8);
-        if(valores.get(valores.size()-2) > media8.get(media8.size()-2) && valores.get(valores.size()-1) < media8.get(media8.size()-1))//CRU
-        {
+        ArrayList<Double> media20 = MediaExp(valores,20);
+        if(media8.get(media8.size()-2) > media20.get(media20.size()-2) && media8.get(media8.size()-1) < media20.get(media20.size()-1))
+        {//cruzamento sem confirmação, tendencia curta de baixa
             return true;
         }
         return false;
