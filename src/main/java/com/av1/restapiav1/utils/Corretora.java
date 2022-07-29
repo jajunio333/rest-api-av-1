@@ -36,8 +36,8 @@ public class Corretora extends Thread{
         this.numNegociacao = 0;
 
         // inicializar os semáforos
-        caixa1 = new Semaphore(1);
-        caixa2 = new Semaphore(1);
+        this.caixa1 = new Semaphore(1);
+        this.caixa2 = new Semaphore(1);
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.av1.restapiav1.utils;
 
 import com.av1.restapiav1.entities.Ativo;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -11,19 +12,19 @@ public class ThreadAnalizeAtivo extends Thread{
     private Corretora corretora;
     private int size;
     private long idCiente;
-    private double saldo;//TODO: SALDO - PRECISA FAZER CONTROLE DE ACESSO
     private boolean comprado;
     private double qtdAtivo;
     public ArrayList<String> timeOperacoes;
     public ArrayList<Double> listaqtdAtivos;
     public ArrayList<Character> compraOuVenda;
+    public GerenciadorSaldo gerenciadorSaldo;
 
-    public ThreadAnalizeAtivo(Ativo ativo, Corretora corretora, int size, long idCiente, double saldo) {
+    public ThreadAnalizeAtivo(Ativo ativo, Corretora corretora, int size, long idCiente, GerenciadorSaldo saldo) {
         this.ativo = ativo;
         this.corretora = corretora;
         this.size = size;
         this.idCiente = idCiente;
-        this.saldo = saldo; //VAI VIRAR FUNÇÃO
+        this.gerenciadorSaldo = saldo; //VAI VIRAR FUNÇÃO
         this.qtdAtivo = 0;
         this.timeOperacoes = new ArrayList<>();
         this.listaqtdAtivos = new ArrayList<>();
@@ -43,41 +44,28 @@ public class ThreadAnalizeAtivo extends Thread{
                    boolean vender = VerificaVenda(ativo.valores);
 
                     ArrayList<Double> volatilidade = Volatilidade(ativo.valores,8);
-                    int prioridade = 5;
 
                     if(volatilidade.get(volatilidade.size()-1) > 0.01 )
                     {
-                        this.setPriority(10);
+                        this.setPriority(10);//TODO: --------------------conferir ---------------------
                     }
 
                    //gerenciar saldo
 
-                   if( comprar && !comprado)
+                   if( comprar && !comprado && gerenciadorSaldo.GetSaldo()>10)
                    {
-                       if (saldo>10)
-                       {
-                           corretora.Caixas (ativo.getNome(), idCiente, 10, 'c', ativo.valores.get(ativo.valores.size()-1));
-                           AtualizaComprasCliente(10, 'c');
-                       }
+                       corretora.Caixas (ativo.getNome(), idCiente, 10, 'c', ativo.valores.get(ativo.valores.size()-1));
+                       AtualizaComprasCliente(10, 'c');
                        comprado= true;
-                       saldo = saldo - 10;
-                       Thread.sleep(500);
                    }
                    if(vender && VerifificaVendaAtivoCorrente())
                    {
-                       if (saldo<1000)
-                       {
-                           corretora.Caixas (ativo.getNome(), idCiente, 0, 'v', ativo.valores.get(ativo.valores.size()-1));
-                           AtualizaComprasCliente(0, 'v');
-                       }
+                       corretora.Caixas (ativo.getNome(), idCiente, 0, 'v', ativo.valores.get(ativo.valores.size()-1));
+                       AtualizaComprasCliente(0, 'v');
                        comprado= false;
-
-                       saldo = saldo + 10;
-
-                       //Aguarda 0,5 segundos para realizar nova operação
-                       Thread.sleep(500);
                    }
-
+                    //Aguarda 0,5 segundos para realizar nova operação
+                    Thread.sleep(500);
                     size = ativo.valores.size();
                 }
                 else
@@ -90,6 +78,7 @@ public class ThreadAnalizeAtivo extends Thread{
                 throw new RuntimeException(e);
             }
         }
+        Imprime();
 
         Thread.interrupted();
     }
@@ -117,7 +106,6 @@ public class ThreadAnalizeAtivo extends Thread{
         }
         return false;
     }
-
     public boolean VerifificaVendaAtivoCorrente()
     {
         if (qtdAtivo != 0)
@@ -130,22 +118,63 @@ public class ThreadAnalizeAtivo extends Thread{
     {
         if (CV == 'v')
         {
-            saldo = qtdAtivo * ativo.valores.get(ativo.dataTime.size()-1);
-            qtdAtivo = 0;
+            double saldo = gerenciadorSaldo.GetSaldo();
+            if (saldo!= -1)
+            {
+                gerenciadorSaldo.SetSaldo(saldo - (qtdAtivo * ativo.valores.get(ativo.dataTime.size() - 1)));
+                qtdAtivo = 0;
 
-            int passo = ativo.dataTime.size()-1;
-            listaqtdAtivos.add((double) 0);
-            timeOperacoes.add(ativo.dataTime.get(passo));
-            compraOuVenda.add(CV);
+                int passo = ativo.dataTime.size()-1;
+                listaqtdAtivos.add((double) 0);
+                timeOperacoes.add(ativo.dataTime.get(passo));
+                compraOuVenda.add(CV);
+            }
+            else
+            {
+                AtualizaComprasCliente(quantidade,CV);
+            }
         }
         else
         {
-            qtdAtivo = quantidade*ativo.valores.get(ativo.dataTime.size()-1);
+            double saldo = gerenciadorSaldo.GetSaldo();
+            if (saldo!= -1) {
+                qtdAtivo = quantidade * ativo.valores.get(ativo.dataTime.size() - 1);
+                gerenciadorSaldo.SetSaldo(saldo - 10);
 
-            int passo = ativo.dataTime.size()-1;
-            listaqtdAtivos.add(qtdAtivo);
-            timeOperacoes.add(ativo.dataTime.get(passo));
-            compraOuVenda.add(CV);
+                int passo = ativo.dataTime.size() - 1;
+                listaqtdAtivos.add(qtdAtivo);
+                timeOperacoes.add(ativo.dataTime.get(passo));
+                compraOuVenda.add(CV);
+            }
+            else
+            {
+                AtualizaComprasCliente(quantidade,CV);
+            }
+        }
+    }
+    private void Imprime ()
+    {
+        double saldo = gerenciadorSaldo.GetSaldo();
+        if (saldo > 0 && qtdAtivo > 0)
+        {
+            double balanc = qtdAtivo * ativo.valores.get(ativo.valores.size()-1);
+            System.out.println("Saldo final cliente id "
+                    + idCiente + ": "
+                    + new DecimalFormat("#,##000.000").format(saldo)
+                    + " ativo: "
+                    + ativo.getNome()
+                    + " saldo do ativo: "
+                    + new DecimalFormat("#,##000.000").format(balanc));
+        }
+        else if (saldo > 0 && qtdAtivo <= 0)
+        {
+            System.out.println("Saldo final cliente id "
+                    + idCiente + ": "
+                    + new DecimalFormat("#,##000.000").format(saldo));
+        }
+        else
+        {
+            Imprime();
         }
     }
     public ArrayList<Double> MediaSimples(ArrayList<Double> valores, int tamanhoMedia)

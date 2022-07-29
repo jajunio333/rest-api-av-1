@@ -78,13 +78,12 @@ public class AtualizaTodosAtivos extends Thread{
                 System.out.println("cliente: " + corretora.idCliente.get(j) +
                                    " operacacao: " + corretora.compraOuVenda.get(j) +
                                    " ativo: " +  corretora.nomeAtivosOperacao.get(j) +
-                                   " saldo ativo: " + new DecimalFormat("#,##00.00").format(corretora.qtdAtivo.get(j)) +
+                                   " quantidade de ativos: " + new DecimalFormat("#,##0.000").format(corretora.qtdAtivo.get(j)) +
                                    " time operacao: "+ corretora.timeOperacoes.get(j));
             }
 
             System.out.println("------------------------------------------");
             System.out.println();
-            corretora.fim = false;
             System.out.println("**************************");
             System.out.println("Desligando atualiza ativo");
             System.out.println("**************************");
@@ -92,6 +91,9 @@ public class AtualizaTodosAtivos extends Thread{
             System.out.println("*******************************");
             System.out.println("Desligando THREADs de analise");
             System.out.println("*******************************");
+            System.out.println();
+
+            corretora.fim = false;
             Thread.interrupted();
         }
         catch (InterruptedException e)
