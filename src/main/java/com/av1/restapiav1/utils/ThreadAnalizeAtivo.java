@@ -13,6 +13,10 @@ public class ThreadAnalizeAtivo extends Thread{
     private long idCiente;
     private double saldo;//TODO: SALDO - PRECISA FAZER CONTROLE DE ACESSO
     private boolean comprado;
+    private double qtdAtivo;
+    public ArrayList<String> timeOperacoes;
+    public ArrayList<Double> listaqtdAtivos;
+    public ArrayList<Character> compraOuVenda;
 
     public ThreadAnalizeAtivo(Ativo ativo, Corretora corretora, int size, long idCiente, double saldo) {
         this.ativo = ativo;
@@ -20,14 +24,16 @@ public class ThreadAnalizeAtivo extends Thread{
         this.size = size;
         this.idCiente = idCiente;
         this.saldo = saldo; //VAI VIRAR FUNÇÃO
+        this.qtdAtivo = 0;
+        this.timeOperacoes = new ArrayList<>();
+        this.listaqtdAtivos = new ArrayList<>();
+        this.compraOuVenda = new ArrayList<>();
     }
 
     @Override
     public void run()
     {
-        int numNegociacao = 0;
-
-        while (this.corretora.fim && numNegociacao < 1000)
+        while (this.corretora.fim && corretora.numNegociacao < 1000)
         {
             try
             {
@@ -41,33 +47,35 @@ public class ThreadAnalizeAtivo extends Thread{
 
                     if(volatilidade.get(volatilidade.size()-1) > 0.01 )
                     {
-                        prioridade = 10;
+                        this.setPriority(10);
                     }
 
                    //gerenciar saldo
-
 
                    if( comprar && !comprado)
                    {
                        if (saldo>10)
                        {
-                           corretora.Caixas (ativo.getNome(), idCiente, 10, 'c', prioridade);
-                           System.out.println(" id Cliente: " + idCiente + " COMPROU 10 ativos: " + ativo.getNome()+" no preço de : "+ ativo.valores.get(ativo.valores.size()-1));
+                           corretora.Caixas (ativo.getNome(), idCiente, 10, 'c', ativo.valores.get(ativo.valores.size()-1));
+                           AtualizaComprasCliente(10, 'c');
                        }
-                       numNegociacao++;
                        comprado= true;
                        saldo = saldo - 10;
+                       Thread.sleep(500);
                    }
-                   if(vender)
+                   if(vender && VerifificaVendaAtivoCorrente())
                    {
                        if (saldo<1000)
                        {
-                           corretora.Caixas (ativo.getNome(), idCiente, 10, 'c', prioridade);
-                           System.out.println(" id Cliente: " + idCiente + " VENDEU 10 ativos: " + ativo.getNome()+" no preço de : "+ ativo.valores.get(ativo.valores.size()-1));
+                           corretora.Caixas (ativo.getNome(), idCiente, 0, 'v', ativo.valores.get(ativo.valores.size()-1));
+                           AtualizaComprasCliente(0, 'v');
                        }
-                       numNegociacao++;
                        comprado= false;
+
                        saldo = saldo + 10;
+
+                       //Aguarda 0,5 segundos para realizar nova operação
+                       Thread.sleep(500);
                    }
 
                     size = ativo.valores.size();
@@ -82,16 +90,21 @@ public class ThreadAnalizeAtivo extends Thread{
                 throw new RuntimeException(e);
             }
         }
+
+        Thread.interrupted();
     }
 
     public boolean VerificaCompra(ArrayList<Double> valores)
     {
-        ArrayList<Double> media8 = MediaExp(valores,8);
-        ArrayList<Double> media20 = MediaExp(valores,20);
-        if(media8.get(media8.size()-2) < media20.get(media20.size()-2) && media8.get(media8.size()-1) > media20.get(media20.size()-1))
-        {//cruzamento sem confirmação, tendencia curta de alta
-            return true;
+        {
+            ArrayList<Double> media8 = MediaExp(valores,8);
+            ArrayList<Double> media20 = MediaExp(valores,20);
+            if(media8.get(media8.size()-2) < media20.get(media20.size()-2) && media8.get(media8.size()-1) > media20.get(media20.size()-1))
+            {//cruzamento sem confirmação, tendencia curta de alta
+                return true;
+            }
         }
+
         return false;
     }
     public boolean VerificaVenda(ArrayList<Double> valores)
@@ -105,6 +118,36 @@ public class ThreadAnalizeAtivo extends Thread{
         return false;
     }
 
+    public boolean VerifificaVendaAtivoCorrente()
+    {
+        if (qtdAtivo != 0)
+        {
+            return true;
+        }
+        return false;
+    }
+    public void AtualizaComprasCliente( int quantidade, char CV)
+    {
+        if (CV == 'v')
+        {
+            saldo = qtdAtivo * ativo.valores.get(ativo.dataTime.size()-1);
+            qtdAtivo = 0;
+
+            int passo = ativo.dataTime.size()-1;
+            listaqtdAtivos.add((double) 0);
+            timeOperacoes.add(ativo.dataTime.get(passo));
+            compraOuVenda.add(CV);
+        }
+        else
+        {
+            qtdAtivo = quantidade*ativo.valores.get(ativo.dataTime.size()-1);
+
+            int passo = ativo.dataTime.size()-1;
+            listaqtdAtivos.add(qtdAtivo);
+            timeOperacoes.add(ativo.dataTime.get(passo));
+            compraOuVenda.add(CV);
+        }
+    }
     public ArrayList<Double> MediaSimples(ArrayList<Double> valores, int tamanhoMedia)
     {
         ArrayList<Double> medias = new ArrayList<>();

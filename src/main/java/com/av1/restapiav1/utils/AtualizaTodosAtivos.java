@@ -5,6 +5,7 @@ import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 
 import java.io.FileReader;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -14,14 +15,16 @@ public class AtualizaTodosAtivos extends Thread{
     public Ativo ativoA, ativoB, ativoC, ativoD;
     private ArrayList<Double> valoresA, valoresB, valoresC, valoresD;
     private ArrayList<String> dataA, dataB, dataC, dataD;
+    private Corretora corretora;
 
 
-    public AtualizaTodosAtivos(Ativo ativoA, Ativo ativoB, Ativo ativoC,Ativo ativoD)
+    public AtualizaTodosAtivos(Corretora corretora, Ativo ativoA, Ativo ativoB, Ativo ativoC,Ativo ativoD)
     {
         this.ativoA = ativoA;
         this.ativoB = ativoB;
         this.ativoC = ativoC;
         this.ativoD = ativoD;
+        this.corretora = corretora;
 
         this.valoresA = GetDocumentoFechamento("arquivo01");
         this.valoresB = GetDocumentoFechamento("arquivo02");
@@ -34,7 +37,7 @@ public class AtualizaTodosAtivos extends Thread{
         this.dataD = RecuperData("arquivo04");
 
         //neccesário iniciar com valores para atender a todas as médias.
-        for (int i = 0; i<Corretora.tamMml; i++)
+        for (int i = 0; i<corretora.tamMml; i++)
         {
             ativoA.valores.add(valoresA.get(i));
             ativoB.valores.add(valoresB.get(i));
@@ -67,11 +70,28 @@ public class AtualizaTodosAtivos extends Thread{
                 Thread.sleep(1000);
             }
 
-            System.out.println("desligando");
-            //TODO: calcular corretora
-            //TODO: fazer rd olhando saldo inicial, e saldo final
-            Corretora.fim = false;
+            System.out.println();
+            System.out.println("----------Operações executadas pelos clientes----------");
 
+            for (int j = 0; j < corretora.timeOperacoes.size(); j++)
+            {
+                System.out.println("cliente: " + corretora.idCliente.get(j) +
+                                   " operacacao: " + corretora.compraOuVenda.get(j) +
+                                   " ativo: " +  corretora.nomeAtivosOperacao.get(j) +
+                                   " saldo ativo: " + new DecimalFormat("#,##00.00").format(corretora.qtdAtivo.get(j)) +
+                                   " time operacao: "+ corretora.timeOperacoes.get(j));
+            }
+
+            System.out.println("------------------------------------------");
+            System.out.println();
+            corretora.fim = false;
+            System.out.println("**************************");
+            System.out.println("Desligando atualiza ativo");
+            System.out.println("**************************");
+            System.out.println();
+            System.out.println("*******************************");
+            System.out.println("Desligando THREADs de analise");
+            System.out.println("*******************************");
             Thread.interrupted();
         }
         catch (InterruptedException e)

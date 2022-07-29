@@ -47,7 +47,6 @@ public class Cliente extends Thread{
         {
             throw new RuntimeException(e);
         }
-
     }
 }
 
