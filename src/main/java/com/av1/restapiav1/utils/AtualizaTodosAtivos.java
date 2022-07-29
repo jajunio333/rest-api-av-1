@@ -3,11 +3,9 @@ package com.av1.restapiav1.utils;
 import com.av1.restapiav1.entities.Ativo;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
-
 import java.io.FileReader;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class AtualizaTodosAtivos extends Thread{

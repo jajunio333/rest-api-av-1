@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 public class ThreadAnalizeAtivo extends Thread{
-
     private Ativo ativo;
     private Corretora corretora;
     private int size;
@@ -24,7 +23,7 @@ public class ThreadAnalizeAtivo extends Thread{
         this.corretora = corretora;
         this.size = size;
         this.idCiente = idCiente;
-        this.gerenciadorSaldo = saldo; //VAI VIRAR FUNÇÃO
+        this.gerenciadorSaldo = saldo;
         this.qtdAtivo = 0;
         this.timeOperacoes = new ArrayList<>();
         this.listaqtdAtivos = new ArrayList<>();
@@ -32,7 +31,7 @@ public class ThreadAnalizeAtivo extends Thread{
     }
 
     @Override
-    public void run()
+    public synchronized void run()
     {
         while (this.corretora.fim && corretora.numNegociacao < 1000)
         {
@@ -78,6 +77,7 @@ public class ThreadAnalizeAtivo extends Thread{
                 throw new RuntimeException(e);
             }
         }
+
         Imprime();
 
         Thread.interrupted();

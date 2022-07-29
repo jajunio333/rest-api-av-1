@@ -1,14 +1,12 @@
 package com.av1.restapiav1.service;
 
 import com.av1.restapiav1.repositories.CsvRepository;
-import com.av1.restapiav1.utils.DynamicDataDemo;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 import jxl.Workbook;
 import jxl.format.Alignment;
 import jxl.format.Colour;
 import jxl.write.*;
-import org.jfree.ui.RefineryUtilities;
 import org.springframework.stereotype.Service;
 import java.io.File;
 import java.io.FileReader;
@@ -17,9 +15,7 @@ import java.util.*;
 
 @Service
 public class CsvService {
-
     private CsvRepository csvRepository;
-
     public CsvService()
     {
         this.csvRepository = csvRepository;
@@ -116,7 +112,6 @@ public class CsvService {
 
         return listaVolatilidade;
     }
-
     public void ExportaExcel(String path)
     {
         try
@@ -200,9 +195,5 @@ public class CsvService {
         {
             e.printStackTrace();
         }
-    }
-    public void PrintRealTime(ArrayList<Double> path)
-    {
-        final DynamicDataDemo demo = new DynamicDataDemo(path);
     }
 }

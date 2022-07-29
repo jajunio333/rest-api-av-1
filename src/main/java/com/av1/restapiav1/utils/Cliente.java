@@ -20,7 +20,7 @@ public class Cliente extends Thread{
     }
 
     @Override
-    public void run()//TODO: verificar cada ativo independente
+    public synchronized void run()
     {
         try
         {

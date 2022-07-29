@@ -58,14 +58,4 @@ public class CsvController {
     public void ExportExcel(@PathVariable("path") String path) {
         service.ExportaExcel(path);
     }
-
-
-
-
-
-    @GetMapping("/print/{path}")
-    public void PrintRealTime(String path)
-    {
-        service.PrintRealTime(GetDocumentoFechamento("arquivo01"));
-    }
 }

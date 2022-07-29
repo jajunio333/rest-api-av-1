@@ -43,9 +43,7 @@ public class Corretora extends Thread{
     @Override
     public synchronized void run() {
 
-
     }
-
     public void Caixas (String nomeAtivo, long idCiente, int quantidade, char CV, double valor) throws InterruptedException {
         if(caixa1.tryAcquire()){
             atualizaCompras(nomeAtivo, idCiente, quantidade, CV);
@@ -55,8 +53,9 @@ public class Corretora extends Thread{
                                 " preço de C/V: " + new DecimalFormat("#,##00.00").format(valor) +
                                 " no CAIXA 1");
             caixa1.release();
-
-        }else{
+        }
+        else
+        {
             if(caixa2.tryAcquire()){
                 atualizaCompras(nomeAtivo, idCiente, quantidade, CV);
                 numNegociacao++;
@@ -67,7 +66,6 @@ public class Corretora extends Thread{
                 caixa2.release();
             }
         }
-
     }
 
     public void atualizaCompras(String nomeAtivo, long idCiente, int quantidade, char CV)
