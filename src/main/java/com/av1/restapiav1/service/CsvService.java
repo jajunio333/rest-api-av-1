@@ -64,7 +64,6 @@ public class CsvService {
     }
     public ArrayList<Double> MediaSimples(String path, int tamanhoMedia)
     {
-
         ArrayList<String> arquivoLido = GetDocumento(path);
         ArrayList<Double> valores = ConvertStringToDouble(arquivoLido,35,42);
         ArrayList<Double> medias = new ArrayList<>();
@@ -84,7 +83,6 @@ public class CsvService {
     }
     public ArrayList<Double> MediaExp(String path, int tamanhoMedia)
     {
-
         ArrayList<String> listaArquivo = GetDocumento(path);
         ArrayList<Double> valores = ConvertStringToDouble(listaArquivo,35,42);
         ArrayList<Double> listaMediasExp = MediaSimples(path,tamanhoMedia);
@@ -99,7 +97,6 @@ public class CsvService {
     }
     public ArrayList<Double> Volatilidade(String path, int tamanhoMedia)
     {
-
         ArrayList<String> listaArquivo = GetDocumento(path);
         ArrayList<Double> valores = ConvertStringToDouble(listaArquivo,35,42);
         ArrayList<Double> listaMedias = MediaSimples(path,tamanhoMedia);

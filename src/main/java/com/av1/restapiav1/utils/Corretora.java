@@ -42,9 +42,15 @@ public class Corretora extends Thread{
 
     @Override
     public synchronized void run() {
-
+        try {
+            System.out.println("iniciando corretora");
+            Thread.sleep(100);
+            System.out.println("Corretora iniciada");
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
-    public void Caixas (String nomeAtivo, long idCiente, int quantidade, char CV, double valor) throws InterruptedException {
+    public boolean Caixas (String nomeAtivo, long idCiente, int quantidade, char CV, double valor) throws InterruptedException {
         if(caixa1.tryAcquire()){
             atualizaCompras(nomeAtivo, idCiente, quantidade, CV);
             numNegociacao++;
@@ -53,19 +59,24 @@ public class Corretora extends Thread{
                                 " preço de C/V: " + new DecimalFormat("#,##00.00").format(valor) +
                                 " no CAIXA 1");
             caixa1.release();
+            return true;
         }
-        else
-        {
-            if(caixa2.tryAcquire()){
-                atualizaCompras(nomeAtivo, idCiente, quantidade, CV);
-                numNegociacao++;
-                System.out.println (" id Cliente: " + idCiente + " tipo de operacao: " +
+
+        else if(caixa2.tryAcquire()){
+            atualizaCompras(nomeAtivo, idCiente, quantidade, CV);
+            numNegociacao++;
+            System.out.println (" id Cliente: " + idCiente + " tipo de operacao: " +
                         CV + " ativo: " + nomeAtivo+" quantia de ativo: "+ quantidade +
                         " preço de C/V: " + new DecimalFormat("#,##00.00").format(valor) +
                         " no CAIXA 2");
                 caixa2.release();
+                return true;
             }
+        else
+        {
+            return false;
         }
+
     }
 
     public void atualizaCompras(String nomeAtivo, long idCiente, int quantidade, char CV)

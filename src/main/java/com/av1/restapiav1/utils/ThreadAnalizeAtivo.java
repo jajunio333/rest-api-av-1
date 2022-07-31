@@ -42,26 +42,35 @@ public class ThreadAnalizeAtivo extends Thread{
                    boolean comprar = VerificaCompra(ativo.valores);
                    boolean vender = VerificaVenda(ativo.valores);
 
-                    ArrayList<Double> volatilidade = Volatilidade(ativo.valores,8);
-
-                    if(volatilidade.get(volatilidade.size()-1) > 0.01 )
+                    if(VerificaRisco())
                     {
                         this.setPriority(10);//TODO: --------------------conferir ---------------------
                     }
 
-                   //gerenciar saldo
-
                    if( comprar && !comprado && gerenciadorSaldo.GetSaldo()>10)
                    {
-                       corretora.Caixas (ativo.getNome(), idCiente, 10, 'c', ativo.valores.get(ativo.valores.size()-1));
-                       AtualizaComprasCliente(10, 'c');
-                       comprado= true;
+                       boolean comprou = corretora.Caixas (ativo.getNome(), idCiente, 10, 'c', ativo.valores.get(ativo.valores.size()-1));
+                       if (comprou)
+                       {
+                           AtualizaComprasCliente(10, 'c');
+                           comprado = true;
+                       }
+                       else
+                       {
+                           comprado= false;
+                       }
                    }
                    if(vender && VerifificaVendaAtivoCorrente())
                    {
-                       corretora.Caixas (ativo.getNome(), idCiente, 0, 'v', ativo.valores.get(ativo.valores.size()-1));
-                       AtualizaComprasCliente(0, 'v');
-                       comprado= false;
+                       boolean vendeu = corretora.Caixas (ativo.getNome(), idCiente, 0, 'v', ativo.valores.get(ativo.valores.size()-1));
+                       if (vendeu) {
+                           AtualizaComprasCliente(0, 'v');
+                           comprado= false;
+                       }
+                       else
+                       {
+                           comprado= true;
+                       }
                    }
                     //Aguarda 0,5 segundos para realizar nova operação
                     Thread.sleep(500);
@@ -82,7 +91,18 @@ public class ThreadAnalizeAtivo extends Thread{
 
         Thread.interrupted();
     }
-
+    public boolean VerificaRisco()
+    {
+        ArrayList<Double> volatilidade = Volatilidade(ativo.valores,8);
+        if(volatilidade.get(volatilidade.size()-1) > 0.005)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
     public boolean VerificaCompra(ArrayList<Double> valores)
     {
         {

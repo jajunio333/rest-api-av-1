@@ -8,7 +8,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AtualizaTodosAtivos extends Thread{
+public class CotacaoExterna extends Thread{
 
     public Ativo ativoA, ativoB, ativoC, ativoD;
     private ArrayList<Double> valoresA, valoresB, valoresC, valoresD;
@@ -16,7 +16,7 @@ public class AtualizaTodosAtivos extends Thread{
     private Corretora corretora;
 
 
-    public AtualizaTodosAtivos(Corretora corretora, Ativo ativoA, Ativo ativoB, Ativo ativoC,Ativo ativoD)
+    public CotacaoExterna(Corretora corretora, Ativo ativoA, Ativo ativoB, Ativo ativoC, Ativo ativoD)
     {
         this.ativoA = ativoA;
         this.ativoB = ativoB;
@@ -29,10 +29,10 @@ public class AtualizaTodosAtivos extends Thread{
         this.valoresC = GetDocumentoFechamento("arquivo03");
         this.valoresD = GetDocumentoFechamento("arquivo04");
 
-        this.dataA = RecuperData("arquivo01");
-        this.dataB = RecuperData("arquivo02");
-        this.dataC = RecuperData("arquivo03");
-        this.dataD = RecuperData("arquivo04");
+        this.dataA = GetData("arquivo01");
+        this.dataB = GetData("arquivo02");
+        this.dataC = GetData("arquivo03");
+        this.dataD = GetData("arquivo04");
 
         //neccesário iniciar com valores para atender a todas as médias.
         for (int i = 0; i<corretora.tamMml; i++)
@@ -47,7 +47,6 @@ public class AtualizaTodosAtivos extends Thread{
             ativoC.dataTime.add(dataC.get(i));
             ativoD.dataTime.add(dataD.get(i));
         }
-
     }
 
     @Override
@@ -64,12 +63,11 @@ public class AtualizaTodosAtivos extends Thread{
                 AtualizaAtivo(ativoC, valoresC.get(i), dataC.get(i));
                 AtualizaAtivo(ativoD, valoresD.get(i), dataD.get(i));
                 i++;
-
                 Thread.sleep(1000);
             }
 
             System.out.println();
-            System.out.println("----------Operações executadas pelos clientes----------");
+            System.out.println("----------Operações executadas pelos clientes na corretora----------");
 
             for (int j = 0; j < corretora.timeOperacoes.size(); j++)
             {
@@ -83,7 +81,7 @@ public class AtualizaTodosAtivos extends Thread{
             System.out.println("------------------------------------------");
             System.out.println();
             System.out.println("**************************");
-            System.out.println("Desligando atualiza ativo");
+            System.out.println("Desligando cotacao externa");
             System.out.println("**************************");
             System.out.println();
             System.out.println("*******************************");
@@ -104,7 +102,6 @@ public class AtualizaTodosAtivos extends Thread{
         ativo.valores.add(valor);
         ativo.dataTime.add(data);
     }
-
     public static ArrayList<String> GetDocumento(String file)
     {
         try {
@@ -143,7 +140,7 @@ public class AtualizaTodosAtivos extends Thread{
         ArrayList<Double> dados = ConvertStringToDouble(aux,35,42);
         return dados;
     }
-    public ArrayList<String> RecuperData (String path)
+    public ArrayList<String> GetData(String path)
     {
         ArrayList<String> aux = GetDocumento(path);
         ArrayList<String> valores = new ArrayList<>();
@@ -152,6 +149,4 @@ public class AtualizaTodosAtivos extends Thread{
         }
         return valores;
     }
-
-
 }
