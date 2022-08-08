@@ -7,12 +7,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 public class ThreadAnalizeAtivo extends Thread{
-    private Ativo ativo;
+    public Ativo ativo;
     private Corretora corretora;
     private int size;
-    private long idCiente;
+    public long idCiente;
     private boolean comprado;
-    private double qtdAtivo;
+    public double qtdAtivo;
     public ArrayList<String> timeOperacoes;
     public ArrayList<Double> listaqtdAtivos;
     public ArrayList<Character> compraOuVenda;
@@ -87,9 +87,9 @@ public class ThreadAnalizeAtivo extends Thread{
             }
         }
 
-        Imprime();
+       // Imprime(); auxiliar para verificar se estavam pegando o mesmo saldo
 
-        Thread.interrupted();
+        this.interrupt();
     }
     public boolean VerificaRisco()
     {

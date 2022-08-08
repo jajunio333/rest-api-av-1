@@ -63,23 +63,25 @@ public class CotacaoExterna extends Thread{
                 AtualizaAtivo(ativoC, valoresC.get(i), dataC.get(i));
                 AtualizaAtivo(ativoD, valoresD.get(i), dataD.get(i));
                 i++;
-                Thread.sleep(1000);
+                Thread.sleep(1200);
             }
+
+            Thread.sleep(1000);
 
             System.out.println();
             System.out.println("----------Operações executadas pelos clientes na corretora----------");
-
-            for (int j = 0; j < corretora.timeOperacoes.size(); j++)
+            for (int j = 0; j < corretora.timeOperacoes.size()-1; j++)
             {
-                System.out.println("cliente: " + corretora.idCliente.get(j) +
-                                   " operacacao: " + corretora.compraOuVenda.get(j) +
-                                   " ativo: " +  corretora.nomeAtivosOperacao.get(j) +
-                                   " quantidade de ativos: " + new DecimalFormat("#,##0.000").format(corretora.qtdAtivo.get(j)) +
+                System.out.println("cliente: " + (corretora.idCliente.size() > j ? corretora.idCliente.get(j) : 0) +
+                                   " operacacao: " + (corretora.compraOuVenda.size() > j ? corretora.compraOuVenda.get(j) : 0) +
+                                   " ativo: " +  (corretora.nomeAtivosOperacao.size() > j ? corretora.nomeAtivosOperacao.get(j) : 0) +
+                                   " quantidade de ativos: " + new DecimalFormat("#,##0.000")
+                                    .format(corretora.qtdAtivo.size() > j ? corretora.qtdAtivo.get(j) : 0) +
                                    " time operacao: "+ corretora.timeOperacoes.get(j));
             }
-
             System.out.println("------------------------------------------");
             System.out.println();
+
             System.out.println("**************************");
             System.out.println("Desligando cotacao externa");
             System.out.println("**************************");
@@ -90,7 +92,7 @@ public class CotacaoExterna extends Thread{
             System.out.println();
 
             corretora.fim = false;
-            Thread.interrupted();
+            this.interrupt();
         }
         catch (InterruptedException e)
         {

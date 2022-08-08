@@ -2,6 +2,8 @@ package com.av1.restapiav1.utils;
 
 import com.av1.restapiav1.entities.Ativo;
 
+import java.text.DecimalFormat;
+
 public class Cliente extends Thread{
     private Ativo ativoA, ativoB, ativoC, ativoD;
     private Corretora corretora;
@@ -40,10 +42,59 @@ public class Cliente extends Thread{
             a2.start();
             a3.start();
             a4.start();
+
+            VerificaFim(ativo1, ativo2, ativo3, ativo4);
         }
         catch (InterruptedException e)
         {
             throw new RuntimeException(e);
+        }
+    }
+    public void VerificaFim(ThreadAnalizeAtivo ativo1, ThreadAnalizeAtivo ativo2, ThreadAnalizeAtivo ativo3, ThreadAnalizeAtivo ativo4) throws InterruptedException {
+        if(!this.corretora.fim)
+        {
+            double saldo = gerenciadorSaldo.GetSaldo();
+
+            if (saldo > 0) // filtro para verificar se conseguiu obter o saldo correto
+            {
+                double balancAt1 = ativo1.qtdAtivo * ativo1.ativo.valores.get(ativo1.ativo.valores.size()-1);
+                double balancAt2 = ativo2.qtdAtivo * ativo2.ativo.valores.get(ativo2.ativo.valores.size()-1);
+                double balancAt3 = ativo3.qtdAtivo * ativo3.ativo.valores.get(ativo3.ativo.valores.size()-1);
+                double balancAt4 = ativo4.qtdAtivo * ativo4.ativo.valores.get(ativo4.ativo.valores.size()-1);
+                saldo = saldo + balancAt1 + balancAt2 + balancAt3 + balancAt4;
+
+                System.out.println( "Saldo final cliente id "
+                                    + this.id + ": "
+                                    + new DecimalFormat("#,##000.000").format(saldo));
+                Imprime(ativo1, balancAt1);
+                Imprime(ativo2, balancAt2);
+                Imprime(ativo3, balancAt3);
+                Imprime(ativo4, balancAt4);
+                this.interrupt();
+            }
+            else
+            {
+                Thread.sleep(10);
+                VerificaFim(ativo1, ativo2, ativo3, ativo4);
+            }
+        }
+        else
+        {
+            Thread.sleep(500);
+            VerificaFim(ativo1, ativo2, ativo3, ativo4);// recursão para verificar fim da corretora
+        }
+    }
+
+    private void Imprime (ThreadAnalizeAtivo ativoAT, double balancoAtivo)
+    {
+        if ( ativoAT.qtdAtivo > 0)
+        {
+            System.out.println("Saldo final cliente id "
+                    + ativoAT.idCiente + ": "
+                    + " no ativo "
+                    + ativoAT.ativo.getNome()
+                    + ": "
+                    + new DecimalFormat("#,##000.000").format(balancoAtivo));
         }
     }
 }

@@ -43,14 +43,21 @@ public class Corretora extends Thread{
     @Override
     public synchronized void run() {
         try {
+            System.out.println("*******************");
             System.out.println("iniciando corretora");
+            System.out.println("*******************");
             Thread.sleep(100);
+            System.out.println();
+            System.out.println("*******************");
             System.out.println("Corretora iniciada");
+            System.out.println("*******************");
+            ExportaFim();
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
     }
-    public boolean Caixas (String nomeAtivo, long idCiente, int quantidade, char CV, double valor) throws InterruptedException {
+    public boolean Caixas (String nomeAtivo, long idCiente, int quantidade, char CV, double valor) throws InterruptedException
+    {
         if(caixa1.tryAcquire()){
             atualizaCompras(nomeAtivo, idCiente, quantidade, CV);
             numNegociacao++;
@@ -78,28 +85,39 @@ public class Corretora extends Thread{
         }
 
     }
-
     public void atualizaCompras(String nomeAtivo, long idCiente, int quantidade, char CV)
     {
         if (CV == 'v')
         {
-            int passo = ativoA.dataTime.size()-1;
-
-            timeOperacoes.add(ativoA.dataTime.get(passo));
-            nomeAtivosOperacao.add(nomeAtivo);
+            this.timeOperacoes.add(ativoA.dataTime.get(ativoA.dataTime.size()-1));
+            this.nomeAtivosOperacao.add(nomeAtivo);
             this.idCliente.add(idCiente);
             this.qtdAtivo.add((double) 0);
             this.compraOuVenda.add(CV);
         }
         else
         {
-            int passo = ativoA.dataTime.size()-1;
-
-            timeOperacoes.add(ativoA.dataTime.get(passo));
-            nomeAtivosOperacao.add(nomeAtivo);
+            this.timeOperacoes.add(ativoA.dataTime.get(ativoA.dataTime.size()-1));
+            this.nomeAtivosOperacao.add(nomeAtivo);
             this.idCliente.add(idCiente);
-            this.qtdAtivo.add(quantidade*ativoA.valores.get(passo));
+            this.qtdAtivo.add(quantidade*ativoA.valores.get(ativoA.valores.size()-1));
             this.compraOuVenda.add(CV);
+        }
+    }
+    public void ExportaFim() throws InterruptedException {
+        if (!this.fim)
+        {
+            Thread.sleep(5000);//tempo grande para não conflitar o print e finalizar execução dos clientes
+            System.out.println("*******************");
+            System.out.println("Fim execucao corretora");
+            System.out.println("*******************");
+            this.interrupt();
+            //TODO: Reconciliar a partir do vetor. necessita saldo final?
+        }
+        else
+        {
+            Thread.sleep(1000);
+            ExportaFim();
         }
     }
 }
