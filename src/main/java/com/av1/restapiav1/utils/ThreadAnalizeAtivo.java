@@ -42,6 +42,8 @@ public class ThreadAnalizeAtivo extends Thread{
                    boolean comprar = VerificaCompra(ativo.valores);
                    boolean vender = VerificaVenda(ativo.valores);
 
+                    this.setPriority(5);
+
                     if(VerificaRisco())
                     {
                         this.setPriority(10);//TODO: --------------------conferir ---------------------

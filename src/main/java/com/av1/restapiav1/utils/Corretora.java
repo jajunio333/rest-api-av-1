@@ -112,7 +112,7 @@ public class Corretora extends Thread{
             System.out.println("Fim execucao corretora");
             System.out.println("*******************");
             this.interrupt();
-            //TODO: Reconciliar a partir do vetor. necessita saldo final?
+            //TODO: Reconciliar a partir do vetor de registro final?
         }
         else
         {
