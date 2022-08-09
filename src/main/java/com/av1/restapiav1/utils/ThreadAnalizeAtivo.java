@@ -46,7 +46,7 @@ public class ThreadAnalizeAtivo extends Thread{
 
                     if(VerificaRisco())
                     {
-                        this.setPriority(10);//TODO: --------------------conferir ---------------------
+                        this.setPriority(10);
                     }
 
                    if( comprar && !comprado && gerenciadorSaldo.GetSaldo()>10)

@@ -72,11 +72,15 @@ public class CotacaoExterna extends Thread{
             System.out.println("----------Operações executadas pelos clientes na corretora----------");
             for (int j = 0; j < corretora.timeOperacoes.size()-1; j++)
             {
-                System.out.println("cliente: " + (corretora.idCliente.size() > j ? corretora.idCliente.get(j) : 0) +
-                                   " operacacao: " + (corretora.compraOuVenda.size() > j ? corretora.compraOuVenda.get(j) : 0) +
-                                   " ativo: " +  (corretora.nomeAtivosOperacao.size() > j ? corretora.nomeAtivosOperacao.get(j) : 0) +
-                                   " quantidade de ativos: " + new DecimalFormat("#,##0.000")
-                                    .format(corretora.qtdAtivo.size() > j ? corretora.qtdAtivo.get(j) : 0) +
+                System.out.println("cliente: " + (corretora.idCliente.size() > j ? corretora.idCliente.get(j) : -1) +
+                                   " operacacao: " + (corretora.compraOuVenda.size() > j ? corretora.compraOuVenda.get(j) : 'x') +
+                                   " ativo: " +  (corretora.nomeAtivosOperacao.size() > j ? corretora.nomeAtivosOperacao.get(j) : -1) +
+                                   " quantidade de ativos (Corretora): " + new DecimalFormat("#,##0.000")
+                                    .format(corretora.qtdAtivoEntrada.size() > j ? corretora.qtdAtivoEntrada.get(j) : -1) +
+                                    " quantidade de ativos (Cliente): " + new DecimalFormat("#,##0.000")
+                                    .format(corretora.qtdAtivoSaida.size() > j ? corretora.qtdAtivoSaida.get(j) : -1) +
+                                  " quantidade de ativos (Cliente) Reconciliado: " + new DecimalFormat("#,##0.000")
+                                    .format(corretora.qtdAtivoSaidaRec.size() > j ? corretora.qtdAtivoSaidaRec.get(j) : -1) +
                                    " time operacao: "+ corretora.timeOperacoes.get(j));
             }
             System.out.println("------------------------------------------");

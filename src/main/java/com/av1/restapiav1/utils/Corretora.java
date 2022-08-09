@@ -1,15 +1,17 @@
 package com.av1.restapiav1.utils;
 
 import com.av1.restapiav1.entities.Ativo;
+import com.av1.restapiav1.utils.RD.Rec;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.concurrent.Semaphore;
 
 public class Corretora extends Thread{
 
     public Ativo ativoA, ativoB, ativoC, ativoD;
-
+    public Rec rec;
     private Semaphore caixa1, caixa2;
     public static final int tamMml= 100; //média mais longa requer 100 valores
     public int numNegociacao;
@@ -17,10 +19,10 @@ public class Corretora extends Thread{
     public ArrayList<String> timeOperacoes;
     public ArrayList<String> nomeAtivosOperacao;
     public ArrayList<Long> idCliente;
-    public ArrayList<Double> qtdAtivo;
+    public ArrayList<Double> qtdAtivoEntrada;
+    public ArrayList<Double> qtdAtivoSaida;
+    public ArrayList<Double> qtdAtivoSaidaRec;
     public ArrayList<Character> compraOuVenda; //c para compra e v para venda
-
-
 
     public Corretora(Ativo ativoA, Ativo ativoB, Ativo ativoC,Ativo ativoD)
     {
@@ -31,9 +33,12 @@ public class Corretora extends Thread{
         this.timeOperacoes = new ArrayList<>();
         this.nomeAtivosOperacao = new ArrayList<>();
         this.idCliente = new ArrayList<>();
-        this.qtdAtivo = new ArrayList<>();
+        this.qtdAtivoEntrada = new ArrayList<>();
+        this.qtdAtivoSaida = new ArrayList<>();
         this.compraOuVenda = new ArrayList<>();
+        this.qtdAtivoSaidaRec = new ArrayList<>();
         this.numNegociacao = 0;
+        this.rec = new Rec();
 
         // inicializar os semáforos
         this.caixa1 = new Semaphore(1);
@@ -44,7 +49,7 @@ public class Corretora extends Thread{
     public synchronized void run() {
         try {
             System.out.println("*******************");
-            System.out.println("iniciando corretora");
+            System.out.println("Iniciando corretora");
             System.out.println("*******************");
             Thread.sleep(100);
             System.out.println();
@@ -87,20 +92,33 @@ public class Corretora extends Thread{
     }
     public void atualizaCompras(String nomeAtivo, long idCiente, int quantidade, char CV)
     {
+        Random gerador = new Random();
         if (CV == 'v')
         {
+            double erro = gerador.nextDouble();
+            double auxRec = rec.RecDados(0, erro);
+
             this.timeOperacoes.add(ativoA.dataTime.get(ativoA.dataTime.size()-1));
             this.nomeAtivosOperacao.add(nomeAtivo);
             this.idCliente.add(idCiente);
-            this.qtdAtivo.add((double) 0);
+            this.qtdAtivoEntrada.add((double) 0);
+            this.qtdAtivoSaida.add(erro);
+            this.qtdAtivoSaidaRec.add(auxRec);
             this.compraOuVenda.add(CV);
         }
         else
         {
+            double qtdAtiv = quantidade*ativoA.valores.get(ativoA.valores.size()-1);
+            double erro = gerador.nextDouble();
+            double auxRec = rec.RecDados(qtdAtiv, qtdAtiv + erro);
+
+
             this.timeOperacoes.add(ativoA.dataTime.get(ativoA.dataTime.size()-1));
             this.nomeAtivosOperacao.add(nomeAtivo);
             this.idCliente.add(idCiente);
-            this.qtdAtivo.add(quantidade*ativoA.valores.get(ativoA.valores.size()-1));
+            this.qtdAtivoEntrada.add(qtdAtiv);
+            this.qtdAtivoSaida.add(qtdAtiv + erro);
+            this.qtdAtivoSaidaRec.add(auxRec);
             this.compraOuVenda.add(CV);
         }
     }
@@ -112,7 +130,7 @@ public class Corretora extends Thread{
             System.out.println("Fim execucao corretora");
             System.out.println("*******************");
             this.interrupt();
-            //TODO: Reconciliar a partir do vetor de registro final?
+
         }
         else
         {
